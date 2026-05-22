@@ -4,8 +4,8 @@ public class VisionCone : MonoBehaviour
 {
     public float viewDistance = 5f;
     public float viewAngle = 90f;
-    public Color normalColor = new Color(1f, 0f, 0f, 0.2f); // Dim red when patrolling
-    public Color detectedColor = new Color(1f, 0f, 0f, 0.8f); // Bright red when player detected
+    public Color normalColor = new Color(1f, 0f, 0f, 0.2f);
+    public Color detectedColor = new Color(1f, 0f, 0f, 0.8f);
     
     private Mesh mesh;
     private MeshFilter meshFilter;
@@ -15,7 +15,6 @@ public class VisionCone : MonoBehaviour
     
     void Start()
     {
-        // Get reference to NPCPatrol script
         npcPatrol = GetComponent<NPCPatrol>();
         
         if (npcPatrol == null)
@@ -23,7 +22,6 @@ public class VisionCone : MonoBehaviour
             Debug.LogError("VisionCone requires NPCPatrol script on same GameObject!");
         }
         
-        // Create vision cone object
         GameObject coneObject = new GameObject("VisionCone");
         coneObject.transform.SetParent(transform);
         coneObject.transform.localPosition = Vector3.zero;
@@ -34,11 +32,10 @@ public class VisionCone : MonoBehaviour
         mesh = new Mesh();
         meshFilter.mesh = mesh;
         
-        // Create material
         coneMaterial = new Material(Shader.Find("Sprites/Default"));
         coneMaterial.color = normalColor;
         meshRenderer.material = coneMaterial;
-        meshRenderer.sortingOrder = -1; // Behind other sprites
+        meshRenderer.sortingOrder = -1;
     }
     
     void LateUpdate()
@@ -51,7 +48,6 @@ public class VisionCone : MonoBehaviour
     {
         if (npcPatrol == null) return;
         
-        // Change cone color based on detection state
         if (npcPatrol.IsPlayerDetected)
         {
             coneMaterial.color = detectedColor;
@@ -70,17 +66,12 @@ public class VisionCone : MonoBehaviour
         Vector3[] vertices = new Vector3[segments + 2];
         int[] triangles = new int[segments * 3];
         
-        vertices[0] = Vector3.zero; // Center point
+        vertices[0] = Vector3.zero;
         
-        // Get sprite renderer to check facing direction
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         if (sr == null) return;
         
-        // Determine base direction based on sprite flip
-        // When flipX = false, guard faces RIGHT (0 degrees)
-        // When flipX = true, guard faces LEFT (180 degrees)
         float baseAngle = sr.flipX ? 180f : 0f;
-        
         float startAngle = baseAngle - (viewAngle / 2f);
         float currentAngle = startAngle;
         
@@ -88,7 +79,6 @@ public class VisionCone : MonoBehaviour
         {
             float rad = currentAngle * Mathf.Deg2Rad;
             
-            // Generate cone pointing RIGHT (0°) or LEFT (180°)
             vertices[i + 1] = new Vector3(
                 Mathf.Cos(rad) * viewDistance,
                 Mathf.Sin(rad) * viewDistance,
@@ -106,4 +96,7 @@ public class VisionCone : MonoBehaviour
         }
         
         mesh.Clear();
-        mesh.vertices = vert
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+    }
+}
